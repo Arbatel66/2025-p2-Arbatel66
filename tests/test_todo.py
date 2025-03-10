@@ -89,17 +89,31 @@ class TestTodo(TodoTest):
 
     def test_get_items_completed(self):
         self._populate_records([TODO_1, TODO_2])
-
+        # print(" def test_get_items_completed(self): doing")
+        # query todo list which "completed" equals true
         response = self.client.get('/api/v1/todos?completed=true')
         self.assertEqual(response.status_code, 200)
+
+        # issues1 AssertionError: 2 != 1
         self.assertEqual(len(response.json), 1)
+        # issues 
+        # print("API 返回的 JSON:", response.json)
+        # print("TODO_1 预期值:", TODO_1)
         self.assertDictSubset(TODO_1, response.json[0])
+        
 
     def test_get_items_window(self):
         self._populate_records([TODO_1, TODO_2, TODO_FUTURE_1, TODO_FUTURE_2])
 
         response = self.client.get('/api/v1/todos?window=5')
         self.assertEqual(response.status_code, 200)
+
+        # issus2 AssertionError: 4 != 3
+        # print("API 返回的 JSON:", response.json)
+        # print("TODO_1 预期值:", TODO_1)
+        # print("TODO_2 预期值:", TODO_2)
+        # print("TODO_FUTURE_1:", TODO_FUTURE_1)
+        # print("TODO_FUTURE_2 预期值:", TODO_FUTURE_2)
         self.assertEqual(len(response.json), 3)
         self.assertDictSubset(TODO_1, response.json[0])
         self.assertDictSubset(TODO_2, response.json[1])
@@ -122,8 +136,12 @@ class TestTodo(TodoTest):
         
     def test_post_item_extra_field(self):
         todo = TODO_1.copy()
+        # COPY TODO_1 and added a new attribute 'extra'
         todo['extra'] = 'extra'
         response = self.client.post('/api/v1/todos', json=todo)
+        # AssertionError: 201 != 400
+        # print("API 返回的 JSON:", response.json)
+        # print("todo 预期值:", todo)
         self.assertEqual(response.status_code, 400)
 
     def test_post_item_success_then_get(self):
@@ -161,6 +179,7 @@ class TestTodo(TodoTest):
 
         todo = {"extra": "extra"}
         response = self.client.put('/api/v1/todos/1', json=todo)
+        # AssertionError: 200 != 400
         self.assertEqual(response.status_code, 400)
 
     def test_put_item_not_found(self):
@@ -170,9 +189,10 @@ class TestTodo(TodoTest):
 
     def test_put_item_change_id(self):
         self._populate_records([TODO_1])
-
+        # try to alter id into 2
         todo = {"id": 2}
         response = self.client.put('/api/v1/todos/1', json=todo)
+        # AssertionError: 200 != 400
         self.assertEqual(response.status_code, 400)
 
         response = self.client.get('/api/v1/todos/1')
